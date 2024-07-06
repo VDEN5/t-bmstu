@@ -53,6 +53,7 @@ type User struct {
 	LastName     string            `json:"last_name"`
 	FirstName    string            `json:"first_name"`
 	Email        string            `json:"email"`
+	Avatar        string            `json:"avatar"`
 	Group        string            `json:"group_name"`
 	Role         string            `json:"role"`
 	SolvedTasks  []string          `json:"solved_tasks"`
