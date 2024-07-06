@@ -20,5 +20,6 @@ func (h *Handler) profileMainPage(c *gin.Context) {
 		"Surname":  profile.LastName,
 		"Name":     profile.FirstName,
 		"Email":    profile.Email,
+		"Avatar":   profile.Avatar,
 	})
 }
