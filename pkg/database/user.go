@@ -14,12 +14,21 @@ func CreateUser(user User) error {
 	}
 	defer conn.Close(context.Background())
 
-	query := `
+	/*query := `
   INSERT INTO users (username, password_hash, last_name, first_name, email, group_name, role, solved_tasks, groups, avatar)
   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
  `
 
 	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups, "gfsjgj")
+	if err != nil {
+		return err
+	}*/
+	query := `
+  INSERT INTO users (username, password_hash, last_name, first_name, email, group_name, role, solved_tasks, groups)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+ `
+
+	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups)
 	if err != nil {
 		return err
 	}
