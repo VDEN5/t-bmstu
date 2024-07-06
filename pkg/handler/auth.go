@@ -38,6 +38,7 @@ type RegistrationForm struct {
 	FirstName string `json:"firstname"`
 	Group     string `json:"group"`
 	Email     string `json:"email"`
+	Avatar    string `json:"avatar"`
 }
 
 var (
@@ -248,6 +249,7 @@ func (h *Handler) signUp(c *gin.Context) {
 				LastName:     form.LastName,
 				FirstName:    form.FirstName,
 				Email:        form.Email,
+				Avatar:       form.Avatar,
 				Group:        form.Group,
 				Role:         "student",
 				SolvedTasks:  []string{},
