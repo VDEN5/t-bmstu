@@ -24,11 +24,11 @@ func CreateUser(user User) error {
 		return err
 	}*/
 	query := `
-  INSERT INTO users (username, password_hash, last_name, first_name, email, group_name, role, solved_tasks, groups)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+  INSERT INTO users (username, password_hash, last_name, first_name, email, group_name, role, solved_tasks, groups,name3)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
  `
 
-	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups)
+	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups,user.Name3)
 	if err != nil {
 		return err
 	}
@@ -204,6 +204,7 @@ type Profile struct {
 	Username  string
 	LastName  string
 	FirstName string
+	Name3 string
 	Email     string
 }
 
@@ -215,7 +216,7 @@ func GetInfoForProfilePage(username string) (User, error) {
 	defer conn.Close(context.Background())
 
 	var user User
-	err = conn.QueryRow(context.Background(), "SELECT username, last_name, first_name, email FROM users WHERE username = $1", username).Scan(&user.Username, &user.LastName, &user.FirstName, &user.Email)
+	err = conn.QueryRow(context.Background(), "SELECT username, last_name, first_name, email, name3 FROM users WHERE username = $1", username).Scan(&user.Username, &user.LastName, &user.FirstName, &user.Email,&user.Name3)
 	if err != nil {
 		return User{}, fmt.Errorf("query execution failed: %v", err)
 	}
