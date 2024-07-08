@@ -36,6 +36,7 @@ type RegistrationForm struct {
 	Password  string `json:"password"`
 	LastName  string `json:"lastname"`
 	FirstName string `json:"firstname"`
+	Name3     string `json:"name3"`
 	Group     string `json:"group"`
 	Email     string `json:"email"`
 	//Avatar    string `json:"avatar"`
@@ -248,6 +249,7 @@ func (h *Handler) signUp(c *gin.Context) {
 				PasswordHash: hashPassword,
 				LastName:     form.LastName,
 				FirstName:    form.FirstName,
+				Name3:        form.Name3,
 				Email:        form.Email,
 				//Avatar:       form.Avatar,
 				Group:        form.Group,
