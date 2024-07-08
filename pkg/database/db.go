@@ -81,6 +81,7 @@ func CreateTables(dbUsername, dbPassword, dbHost, dbName string) error {
 		   password_hash TEXT,
 		   last_name     TEXT,
 		   first_name    TEXT,
+		   name3 TEXT,
 		   email         TEXT,
 		   group_name    TEXT,
 		   role          TEXT,
