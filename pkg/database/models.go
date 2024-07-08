@@ -51,8 +51,9 @@ type User struct {
 	Username     string            `json:"username"`
 	PasswordHash string            `json:"password_hash"`
 	LastName     string            `json:"last_name"`
-	FirstName    string            `json:"first_name"`
-	Email        string            `json:"email"`
+	FirstName    string `json:"first_name"`
+	Name3 string `json: "name3"`
+	Email        string `json:"email"`
 	//Avatar        string            `json:"avatar"`
 	Group        string            `json:"group_name"`
 	Role         string            `json:"role"`
