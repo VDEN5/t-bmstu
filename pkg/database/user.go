@@ -216,7 +216,23 @@ func GetInfoForProfilePage(username string) (User, error) {
 	defer conn.Close(context.Background())
 
 	var user User
-	err = conn.QueryRow(context.Background(), "SELECT username, last_name, first_name, email, name3 FROM users WHERE username = $1", username).Scan(&user.Username, &user.LastName, &user.FirstName, &user.Email,&user.Name3)
+	gituser := ""
+	err = conn.QueryRow(context.Background(), "SELECT username, last_name, first_name, email, name3 FROM users WHERE username = $1", username).Scan(&user.Username, &user.LastName, &user.FirstName, &user.Email, &gituser)
+	name := gituser
+	reqURL := "https://github.com/" + name
+	resp, err1 := http.Get(reqURL)
+	if err1 != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err2 := io.ReadAll(resp.Body)
+	if err2 != nil {
+		panic(err)
+	}
+	str := string(body)
+	ind := strings.Index(str, "https://avatars.githubusercontent.com/u/")
+	str1 := str[ind : ind+52]
+	user.Name3 = str1
 	if err != nil {
 		return User{}, fmt.Errorf("query execution failed: %v", err)
 	}
