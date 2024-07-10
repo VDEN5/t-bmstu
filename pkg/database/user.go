@@ -239,3 +239,18 @@ func GetInfoForProfilePage(username string) (User, error) {
 
 	return user, nil
 }
+
+func GetInfoForProfilePage1(id string) (string, error) {
+	conn, err := pgx.Connect(context.Background(), DbURL)
+	if err != nil {
+		return "", fmt.Errorf("unable to connect to database: %v", err)
+	}
+	defer conn.Close(context.Background())
+	gituser := ""
+	err = conn.QueryRow(context.Background(), "SELECT language FROM submissions WHERE id = $1", id).Scan(&gituser)
+
+	if err != nil {
+		return "", fmt.Errorf("query execution failed: %v", err)
+	}
+	return gituser, nil
+}
