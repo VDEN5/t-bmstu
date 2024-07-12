@@ -7,7 +7,7 @@ import (
 	//"time"
 )
 
-func CreateMessage(msguser string, theme string, msgtext string) (int, error) {
+func CreateMessage(msg Message) (int, error) {
 	conn, err := pgx.Connect(context.Background(), DbURL)
 	if err != nil {
 		return 0, err
@@ -18,9 +18,9 @@ func CreateMessage(msguser string, theme string, msgtext string) (int, error) {
 	err = conn.QueryRow(
 		context.Background(),
 		"INSERT INTO forumtable (forumtheme, forumtask, forumuser) VALUES ($1, $2, $3) RETURNING id",
-		theme,
-		msgtext,
-		msguser,
+		msg.ForumTheme,
+		msg.ForumTask,
+		msg.ForumUser,
 	).Scan(&contestID)
 	if err != nil {
 		return 0, err
