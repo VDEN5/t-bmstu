@@ -51,6 +51,13 @@ func CreateTables(dbUsername, dbPassword, dbHost, dbName string) error {
             submission_number VARCHAR(255),
             status INTEGER                                                    
         );
+	
+	CREATE TABLE IF NOT EXISTS forumtable (
+            id SERIAL PRIMARY KEY,
+			forumtheme TEXT,
+            forumtask TEXT,
+            forumuser VARCHAR(255)                                                    
+        );
 
         CREATE TABLE IF NOT EXISTS contests (
             id SERIAL PRIMARY KEY,
