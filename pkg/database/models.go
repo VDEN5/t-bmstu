@@ -35,6 +35,12 @@ type Contest struct {
 	Duration     time.Duration          `json:"duration"`
 }
 
+type Message struct {
+	ID         string `json:"id"`
+	ForunUser  string `json:"forumuser"`
+	ForumTheme string `json:"forumtheme"`
+	ForumTask  string `json:"forumtask"`
+}
 type Task struct {
 	ID             string                 `json:"id"`
 	Name           string                 `json:"name"`
