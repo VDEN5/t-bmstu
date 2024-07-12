@@ -37,7 +37,7 @@ type Contest struct {
 
 type Message struct {
 	ID         string `json:"id"`
-	ForunUser  string `json:"forumuser"`
+	ForumUser  string `json:"forumuser"`
 	ForumTheme string `json:"forumtheme"`
 	ForumTask  string `json:"forumtask"`
 }
