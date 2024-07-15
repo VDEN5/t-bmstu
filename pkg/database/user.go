@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
+
 	"github.com/jackc/pgx/v4"
 )
 
@@ -14,21 +18,12 @@ func CreateUser(user User) error {
 	}
 	defer conn.Close(context.Background())
 
-	/*query := `
-  INSERT INTO users (username, password_hash, last_name, first_name, email, group_name, role, solved_tasks, groups, avatar)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
- `
-
-	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups, "gfsjgj")
-	if err != nil {
-		return err
-	}*/
 	query := `
   INSERT INTO users (username, password_hash, last_name, first_name, email, group_name, role, solved_tasks, groups,name3)
   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
  `
 
-	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups,user.Name3)
+	_, err = conn.Exec(context.Background(), query, user.Username, user.PasswordHash, user.LastName, user.FirstName, user.Email, user.Group, user.Role, user.SolvedTasks, user.Groups, user.Name3)
 	if err != nil {
 		return err
 	}
@@ -204,7 +199,7 @@ type Profile struct {
 	Username  string
 	LastName  string
 	FirstName string
-	Name3 string
+	Name3     string
 	Email     string
 }
 
@@ -239,7 +234,6 @@ func GetInfoForProfilePage(username string) (User, error) {
 
 	return user, nil
 }
-
 func GetInfoForProfilePage1(id string) (string, error) {
 	conn, err := pgx.Connect(context.Background(), DbURL)
 	if err != nil {
@@ -253,4 +247,18 @@ func GetInfoForProfilePage1(id string) (string, error) {
 		return "", fmt.Errorf("query execution failed: %v", err)
 	}
 	return gituser, nil
+}
+func GetInfoForProfilePage2(id string) string {
+	conn, err := pgx.Connect(context.Background(), DbURL)
+	if err != nil {
+		return ""
+	}
+	defer conn.Close(context.Background())
+	gituser := ""
+	err = conn.QueryRow(context.Background(), "SELECT last_name FROM users WHERE username = $1", id).Scan(&gituser)
+
+	if err != nil {
+		return ""
+	}
+	return gituser
 }
