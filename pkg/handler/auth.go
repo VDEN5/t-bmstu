@@ -252,10 +252,10 @@ func (h *Handler) signUp(c *gin.Context) {
 				Name3:        form.Name3,
 				Email:        form.Email,
 				//Avatar:       form.Avatar,
-				Group:        form.Group,
-				Role:         "student",
-				SolvedTasks:  []string{},
-				Groups:       []json.RawMessage{},
+				Group:       form.Group,
+				Role:        "student",
+				SolvedTasks: []string{},
+				Groups:      []json.RawMessage{},
 			})
 
 			c.Redirect(302, "/auth/login")
