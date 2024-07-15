@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
 	"html/template"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -63,6 +64,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		view.GET("submission/:id", h.getSumbissionCode)
 
+		view.GET("forum1/:id", h.getmsgid)
 		profile := view.Group("/profile")
 		{
 			profile.GET("/", h.profileMainPage)
@@ -75,6 +77,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		view.GET("/timus", h.timusTaskList)
 		view.GET("/acmp", h.acmpTaskList)
+		//view.GET("/codeforces", h.codeforcesTaskList)
 
 		problem := view.Group("/problem")
 		{
