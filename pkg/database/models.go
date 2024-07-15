@@ -40,7 +40,9 @@ type Message struct {
 	ForumUser  string `json:"forumuser"`
 	ForumTheme string `json:"forumtheme"`
 	ForumTask  string `json:"forumtask"`
+	MSGtime    string `json:"msgtime"`
 }
+
 type Task struct {
 	ID             string                 `json:"id"`
 	Name           string                 `json:"name"`
@@ -54,18 +56,18 @@ type Task struct {
 }
 
 type User struct {
-	Username     string            `json:"username"`
-	PasswordHash string            `json:"password_hash"`
-	LastName     string            `json:"last_name"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+	LastName     string `json:"last_name"`
 	FirstName    string `json:"first_name"`
-	Name3 string `json: "name3"`
+	Name3        string `json: "name3"`
 	Email        string `json:"email"`
-	//Avatar        string            `json:"avatar"`
-	Group        string            `json:"group_name"`
-	Role         string            `json:"role"`
-	SolvedTasks  []string          `json:"solved_tasks"`
-	Groups       []json.RawMessage `json:"groups"`
-	Tasks        []json.RawMessage `json:"tasks"`
+	//Avatar       string            `json:"avatar"`
+	Group       string            `json:"group_name"`
+	Role        string            `json:"role"`
+	SolvedTasks []string          `json:"solved_tasks"`
+	Groups      []json.RawMessage `json:"groups"`
+	Tasks       []json.RawMessage `json:"tasks"`
 }
 
 type Group struct {
@@ -76,3 +78,9 @@ type Group struct {
 	Admins     []string `json:"admins"`
 	InviteCode []byte   `json:"invite_code"`
 }
+
+// type messa struct {
+// 	sender  string `json:"forumuser"`
+// 	theme string `json:"forumtheme"`
+// 	task  string `json:"forumtask"`
+// }
