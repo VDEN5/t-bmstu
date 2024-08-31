@@ -24,6 +24,13 @@ func (t ByID) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
 func (t ByID) Less(i, j int) bool { return t[i].ID < t[j].ID }
 
 func (h *Handler) getContestTasks(c *gin.Context) {
+	profile, err1 := database.GetInfoForProfilePage(c.GetString("username"))
+
+	if err1 != nil {
+		// TODO return error
+		return
+	}
+
 	contestId, err := strconv.Atoi(c.Param("contest_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -52,10 +59,18 @@ func (h *Handler) getContestTasks(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "contest-tasks-list.tmpl", gin.H{
 		"Tasks": taskList,
+		"Name3": profile.Name3,
 	})
 }
 
 func (h *Handler) getTask(c *gin.Context) {
+	profile, err1 := database.GetInfoForProfilePage(c.GetString("username"))
+
+	if err1 != nil {
+		// TODO return error
+		return
+	}
+
 	stringContestId := c.Param("contest_id")
 	ok := true
 	value := ""
@@ -125,6 +140,7 @@ func (h *Handler) getTask(c *gin.Context) {
 			"Tests":       tests,
 			"Languages":   taskInfo.onlineJudge.GetLanguages(),
 			"Submissions": submissions,
+			"Name3":       profile.Name3,
 		})
 	} else {
 		c.JSON(http.StatusBadRequest, "No such task")

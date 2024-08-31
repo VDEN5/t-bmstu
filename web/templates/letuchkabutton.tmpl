@@ -9,44 +9,61 @@
 		<link href="/styles/base.css?hash=v86ddssasda6df8" rel="stylesheet" />
 		<link href="/styles/groups.css?hash=v86d6sdasadffdf8" rel="stylesheet" />
 		<style>
-			.chat-list {
-			    list-style-type: none;
-			    padding: 0;
+			body {
+			    font-family: Arial, sans-serif;
+			    background-color: #f4f4f4;
+			    margin: 0;
+			    padding: 20px;
 			}
-			.chat-item {
-			    background-color: #FFFFFF;
+
+			h1 {
+			    text-align: center;
+			    color: #333;
+			}
+
+			.task-list {
+			    max-width: 600px;
+			    margin: 0 auto;
+			    padding: 20px;
+			    background-color: #fff;
 			    border-radius: 8px;
-			    margin-bottom: 10px;
-			    padding: 15px;
+			    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.task {
 			    display: flex;
+			    justify-content: space-between;
 			    align-items: center;
-			    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-			    transition: background-color 0.3s;
+			    padding: 10px;
+			    border-bottom: 1px solid #eaeaea;
+			    text-align: center; /* Центрирование текста */
+			}
+
+			.task:last-child {
+			    border-bottom: none; /* Убираем границу у последней задачи */
+			}
+
+			.completed {
+			    background-color: #28a745; /* Непрозрачный зелёный фон для решённых задач */
+			    color: #fff; /* Белый цвет текста */
+			    padding: 10px;
+			    border-radius: 5px;
+			    border: 3px solid #28a745; /* Жирная зелёная рамка */
+			    margin-bottom: 10px; /* Отступ между задачами */
+			}
+
+			.button {
+			    background-color: #007bff; /* Синий фон для кнопки */
+			    color: white; /* Белый цвет текста кнопки */
+			    border: none;
+			    border-radius: 5px;
+			    padding: 10px 15px;
+			    cursor: pointer;
 			    text-decoration: none; /* Убираем подчеркивание у ссылок */
-			    color: inherit; /* Наследуем цвет текста */
 			}
-			.chat-item:hover {
-			    background-color: #F0F0F0;
-			}
-			.avatar {
-			    width: 50px;
-			    height: 50px;
-			    border-radius: 50%;
-			    margin-right: 15px;
-			}
-			.chat-info {
-			    flex-grow: 1;
-			}
-			.chat-name {
-			    font-weight: bold;
-			    color: #333333;
-			}
-			.chat-message {
-			    color: #777777;
-			}
-			.chat-time {
-			    font-size: 12px;
-			    color: #AAAAAA;
+
+			.button:hover {
+			    background-color: #0056b3; /* Темнее синий при наведении */
 			}
 		</style>
 	</head>
@@ -109,48 +126,41 @@
 						</ul>
 					</div>
 				</nav>
-				<div id="content" class="collapsed">
-					<div class="container mt-5">
-						<div class="row justify-content-center">
-							<div class="col-md-6">
-								<div class="card w-600">
-									<div class="card-body">
-										<form id="loginForm1" method="POST">
-											<div class="mb-3">
-												<input type="text" class="form-control" id="username1" name="username1" placeholder="Тема" required />
-											</div>
-											<label for="exampleFormControlTextarea1" class="form-label">Сообщение</label>
-											<textarea class="form-control" id="password1" rows="3"></textarea>
-											<button type="submit" class="btn btn-primary btn-login">Отправить</button>
 
-											<div id="errorMessage" class="text-center small-text mt-3" style="color: red"></div>
-										</form>
+				<div id="content" class="collapsed">
+					<div class="text-center text-muted align-middle mt-4">
+						<div class="container mt-5">
+							<div class="row justify-content-center">
+								<div class="col-md-6">
+									<div class="card w-600">
+										<div class="card-body">
+											<form id="loginForm1" method="POST">
+												<button type="submit" class="btn btn-primary btn-login">{{.Buttext}}</button>
+												<div id="errorMessage" class="text-center small-text mt-3" style="color: red"></div>
+											</form>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="text-muted text-muted align-middle mt-4">
-						<ul class="chat-list">
-							{{range .list}}
-							<div>
-								<li>
-									<a href="/view/forum2/{{ .Theme1 }}" class="chat-item">
-										<img src="{{ .Userava }}" alt="Avatar" class="avatar" />
-										<div class="chat-info">
-											<div class="chat-name">{{ .Theme }}</div>
-											<div class="chat-message">{{ .User }}: {{ .Task }}</div>
-											<div class="chat-time">{{ .Time }}</div>
-										</div>
-									</a>
-								</li>
+						<div class="task-list">
+							{{range $key, $value := .letres}} {{if eq $value.Res 1}}
+							<div class="task completed">
+								Задача {{$value.Number}}
+								<a href="{{$value.Task}}" class="button">Перейти</a>
 							</div>
-							{{end}}
-						</ul>
+							{{else}}
+							<div class="task">
+								Задача {{$value.Number}}
+								<a href="{{$value.Task}}" class="button">Перейти</a>
+							</div>
+							{{end}} {{end}}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="/scripts/base.js?hash=1fs2"></script>
 	</body>
@@ -160,22 +170,19 @@
 		    loginForm1.onsubmit = async (e) => {
 		      e.preventDefault(); // Отменяем стандартное поведение формы
 
-		      const username1 = document.getElementById('username1').value;
-		      const password1 = document.getElementById('password1').value;
-
 		      // Выполняем отправку данных формы на сервер
 		      try {
-		        const response = await fetch('/view/forum', {
+		        const response = await fetch('/view/letuchka', {
 		          method: 'POST',
 		          headers: {
 		            'Content-Type': 'application/json'
 		          },
-		          body: JSON.stringify({ username1, password1 })
+		          body: JSON.stringify({})
 		        });
 
 		        if (response.ok) {
 		          // Если запрос выполнен успешно, перенаправляем пользователя на другую страницу
-		          window.location.href = '/view/forum';
+		          window.location.href = '/view/letuchka';
 		        } else {
 		          const responseData = await response.json(); // Ожидаем разрешения промиса
 		      Toastify({

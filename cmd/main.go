@@ -57,9 +57,9 @@ func InitConfig() Config {
 		return Config{
 			appPort:       "8080",
 			dbUsername:    "postgres",
-			dbPassword:    "vden2005", //тут укажи свой пароль
+			dbPassword:    "qwerty", //тут укажи свой пароль
 			dbName:        "postgres",
-			SessionSecret: "govno",
+			SessionSecret: "session",
 			dbHost:        "localhost",
 		}
 	}

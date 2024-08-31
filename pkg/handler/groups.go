@@ -13,6 +13,12 @@ func (h *Handler) groups(c *gin.Context) {
 	switch role {
 	case "student":
 		{
+			profile, err1 := database.GetInfoForProfilePage(c.GetString("username"))
+
+			if err1 != nil {
+				// TODO return error
+				return
+			}
 			groups, err := database.GetUserGroups(c.GetString("username"))
 
 			if err != nil {
@@ -22,6 +28,7 @@ func (h *Handler) groups(c *gin.Context) {
 
 			c.HTML(http.StatusOK, "groups.tmpl", gin.H{
 				"Groups": groups,
+				"Name3":  profile.Name3,
 			})
 		}
 	case "teacher":

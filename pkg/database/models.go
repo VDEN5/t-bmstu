@@ -23,6 +23,24 @@ type Submission struct {
 	Status           int    `json:"status"` // Статус проверки 0 - не отправлено, 1 - проверяется, 2 - проверка окончена
 }
 
+type Ranktable struct {
+	ID         int       `json:"id"`
+	RankUser   string    `json:"rankuser"`
+	TestSystem string    `json:"testsystem"`
+	ProblemId  int       `json:"problemid"`
+	Points     int       `json:"points"`
+	Time       time.Time `json:"time"`
+}
+
+type Letuchka struct {
+	ID        int       `json:"id"`
+	Tasks     []string  `json:"tasks"`
+	Soltasks  []string  `json:"soltasks"`
+	Letuser   string    `json:"letuser"`
+	Starttime time.Time `json:"starttime"`
+	Status    int       `json:"status"`
+}
+
 type Contest struct {
 	ID           int                    `json:"id"`
 	Title        string                 `json:"title"`

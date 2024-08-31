@@ -60,6 +60,24 @@ func CreateTables(dbUsername, dbPassword, dbHost, dbName string) error {
 			msgtime TEXT                                                    
         );
 
+		CREATE TABLE IF NOT EXISTS lettable (
+            id SERIAL PRIMARY KEY,
+			tasks TEXT[],
+            soltasks TEXT[],
+            letuser VARCHAR(255),
+			starttime TIMESTAMP,
+			status INTEGER                                                    
+        );
+
+		CREATE TABLE IF NOT EXISTS ranktable (
+            id SERIAL PRIMARY KEY,
+            rankuser VARCHAR(255),
+			testsystem TEXT,
+			problemid INTEGER,
+			time TIMESTAMP,
+			points INTEGER                                                    
+        );
+
         CREATE TABLE IF NOT EXISTS contests (
             id SERIAL PRIMARY KEY,
             title VARCHAR(255),

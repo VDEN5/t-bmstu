@@ -1,4 +1,5 @@
 module github.com/VDEN5/t-bmstu
+
 go 1.20
 
 require (
@@ -24,6 +25,7 @@ require (
 	github.com/go-playground/validator/v10 v10.14.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/gordejka179/t-bmstu v0.0.0-20240725132807-346075c7018a // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect

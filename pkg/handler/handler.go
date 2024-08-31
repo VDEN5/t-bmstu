@@ -75,9 +75,32 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			hwIu9Bmstu.GET("/", h.hwIu9MainPage)
 		}
 
+		let := view.Group("/letuchka")
+		{
+			let.GET("/", h.letuchka)
+			let.POST("/", h.letuchka)
+		}
+
+		rating := view.Group("/rating")
+		{
+			rating.GET("/", h.rating)
+		}
+
+		forum2 := view.Group("/forum2")
+		{
+			forum2.GET("/:id", h.getforumtheme)
+			forum2.POST("/:id", h.getforumtheme)
+		}
+
 		view.GET("/timus", h.timusTaskList)
 		view.GET("/acmp", h.acmpTaskList)
-		//view.GET("/codeforces", h.codeforcesTaskList)
+		view.GET("/codeforces", h.codeforcesTaskList)
+		settings := view.Group("/settings")
+		{
+			settings.GET("/", h.settings)
+			settings.POST("passwd", h.passwd)
+
+		}
 
 		problem := view.Group("/problem")
 		{

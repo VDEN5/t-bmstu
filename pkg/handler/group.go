@@ -52,6 +52,12 @@ func (h *Handler) createGroup(c *gin.Context) {
 }
 
 func (h *Handler) getGroupContests(c *gin.Context) {
+	profile, err1 := database.GetInfoForProfilePage(c.GetString("username"))
+
+	if err1 != nil {
+		// TODO return error
+		return
+	}
 	groupId, err := strconv.Atoi(c.Param("group_id"))
 
 	if err != nil {
@@ -97,6 +103,7 @@ func (h *Handler) getGroupContests(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "group_contests.tmpl", gin.H{
 		"Contests": contestsForTemplate,
+		"Name3":    profile.Name3,
 	})
 }
 

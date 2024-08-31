@@ -19,7 +19,7 @@
 <div>
     <div class="avatar-container">
         <a href="/view/profile">
-            <img src="https://avatars.githubusercontent.com/u/77489413?v=4" alt="User Avatar" class="user-avatar">
+            <img src={{.Name3}} alt="User Avatar" class="user-avatar">
         </a>
     </div>
 
@@ -44,6 +44,12 @@
                         <a href="/view/home" class="d-flex align-items-center text-decoration-none">
                             <span class="me-2 icons"><i class="bi bi-house-door simple-text"></i></span>
                             <span class="sidebar-label simple-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="/view/rating" class="d-flex align-items-center text-decoration-none">
+                            <span class="me-2 icons"><i class="bi bi-bar-chart simple-text"></i></span>
+                            <span class="sidebar-label simple-text">Rating</span>
                         </a>
                     </li>
                     <li class="mb-2">
@@ -75,7 +81,7 @@
                 {{range .Tasks}}
                 <div class="card task-card mt-2 mb-2" onclick="redirectToTask('{{.ID}}');">
                     <div class="card-body">
-                        <h5 class="card-title blue-text">{{.Name}}</h5>
+                        <h5 class="card-title blue-text">{{.Name}} [{{.Yourpoi}}/{{.Points}}]</h5>
                         <!-- <p class="card-text">Description of task {{.ID}}</p> -->
                     </div>
                 </div>

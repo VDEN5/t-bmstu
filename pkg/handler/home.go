@@ -23,14 +23,20 @@ func (h *Handler) add(c *gin.Context) {
 }
 
 func (h *Handler) home(c *gin.Context) {
+	profile, err := database.GetInfoForProfilePage(c.GetString("username"))
+
+	if err != nil {
+		// TODO return error
+		return
+	}
 	switch c.GetString("role") {
 	case "student":
 		{
-			c.HTML(http.StatusOK, "home.tmpl", gin.H{})
+			c.HTML(http.StatusOK, "home.tmpl", gin.H{"Name3": profile.Name3})
 		}
 	case "admin":
 		{
-			c.HTML(http.StatusOK, "home-admin.tmpl", gin.H{})
+			c.HTML(http.StatusOK, "home-admin.tmpl", gin.H{"Name3": profile.Name3})
 		}
 	}
 

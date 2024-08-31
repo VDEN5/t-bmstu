@@ -88,6 +88,12 @@
                         </a>
                     </li>
                     <li class="mb-2">
+                        <a href="/view/rating" class="d-flex align-items-center text-decoration-none">
+                            <span class="me-2 icons"><i class="bi bi-bar-chart simple-text"></i></span>
+                            <span class="sidebar-label simple-text">Rating</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
                         <a href="/view/hw_iu9_bmstu" class="d-flex align-items-center text-decoration-none">
                             <span class="me-2 icons"><i class="bi bi-code-square simple-text"></i></span>
                             <span class="sidebar-label simple-text">hw_iu9_bmstu</span>
@@ -117,6 +123,7 @@
                 <div class="nickname">@{{.NickName}}</div>
                 <div class="name">{{.Surname}}</div>
                 <div class="name">{{.Name}}</div>
+                <div class="name">место в рейтинге: {{.rank}}</div>
                 <div class="email">{{.Email}}</div>
             </div>
         </div>

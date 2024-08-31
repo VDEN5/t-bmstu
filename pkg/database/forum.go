@@ -102,29 +102,67 @@ func GetTasksFromTheme(theme string) ([]messa, []string, error) {
 	return res, r, nil
 }
 
-func GetAllUserThemes(user string) ([]string, error) {
+type mes struct {
+	task   string `json:"forumtask"`
+	sender string `json:"fsender"`
+	time   string `json:"ftime"`
+}
+
+func GetTasksFromTheme1(theme string) ([]string, []string, []string, error) {
 	conn, err := pgx.Connect(context.Background(), DbURL)
-	mem := make(map[string]bool)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	defer conn.Close(context.Background())
+
+	rows, err := conn.Query(context.Background(), "SELECT forumtheme,forumtask,forumuser,msgtime FROM forumtable")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	defer rows.Close()
+
+	var ta, se, ti []string
+	for rows.Next() {
+		var ta1, se1, ti1 string
+		theme1 := ""
+		if err := rows.Scan(&theme1, &ta1, &se1, &ti1); err != nil {
+			return nil, nil, nil, err
+		}
+		if (theme1 == theme) && (ta1 != "") {
+			ta = append(ta, ta1)
+			se = append(se, se1)
+			ti = append(ti, ti1)
+		}
+	}
+
+	return ta, se, ti, nil
+}
+
+func GetAllUserThemes(user string) (map[string]Message, error) {
+	conn, err := pgx.Connect(context.Background(), DbURL)
+	//mem := make(map[string]bool)
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close(context.Background())
 
-	rows, err := conn.Query(context.Background(), "SELECT forumtheme FROM forumtable WHERE forumuser = $1", user)
+	rows, err := conn.Query(context.Background(), "SELECT forumtheme,forumtask,forumuser,msgtime FROM forumtable WHERE forumuser = $1", user)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var res []string
+	res := make(map[string]Message)
 	for rows.Next() {
-		var res1 string
-		if err := rows.Scan(&res1); err != nil {
+		var th, ta, us, ti string
+		if err := rows.Scan(&th, &ta, &us, &ti); err != nil {
 			return nil, err
 		}
-		if !mem[res1] {
-			res = append(res, res1)
-			mem[res1] = true
+		res[th] = Message{
+			ForumTheme: th,
+			ForumTask:  ta,
+			ForumUser:  us,
+			MSGtime:    ti,
 		}
 	}
 
@@ -134,33 +172,6 @@ func GetAllUserThemes(user string) ([]string, error) {
 type messatheme struct {
 	theme string
 	msgs  []messa
-}
-
-func GetUserForum(user string) ([]messatheme, []string, []string, []string, []string, error) { //1-theme,2-task,3-user,4-time
-	thems, err := GetAllUserThemes(user)
-	res := make([]messatheme, 0)
-	theme, task, usern, ti := make([]string, 0), make([]string, 0), make([]string, 0), make([]string, 0)
-	if err != nil {
-		return nil, nil, nil, nil, nil, err
-	}
-	for _, them := range thems {
-		msgs, _, err := GetTasksFromTheme(them)
-		if err != nil {
-			return nil, nil, nil, nil, nil, err
-		}
-		for _, m := range msgs {
-			theme = append(theme, m.theme)
-			task = append(task, m.task)
-			usern = append(usern, m.sender)
-			ti = append(ti, m.time)
-		}
-		res1 := messatheme{
-			theme: them,
-			msgs:  msgs,
-		}
-		res = append(res, res1)
-	}
-	return res, theme, task, usern, ti, nil
 }
 
 func GetInfoForForumProfilePage(id string) (string, string, string) {

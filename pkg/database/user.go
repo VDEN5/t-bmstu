@@ -248,17 +248,3 @@ func GetInfoForProfilePage1(id string) (string, error) {
 	}
 	return gituser, nil
 }
-func GetInfoForProfilePage2(id string) string {
-	conn, err := pgx.Connect(context.Background(), DbURL)
-	if err != nil {
-		return ""
-	}
-	defer conn.Close(context.Background())
-	gituser := ""
-	err = conn.QueryRow(context.Background(), "SELECT last_name FROM users WHERE username = $1", id).Scan(&gituser)
-
-	if err != nil {
-		return ""
-	}
-	return gituser
-}

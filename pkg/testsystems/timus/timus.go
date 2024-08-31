@@ -18,8 +18,10 @@ import (
 )
 
 type Task struct {
-	ID   string
-	Name string
+	ID      string
+	Name    string
+	Points  string
+	Yourpoi int
 }
 
 type Timus struct {
@@ -172,6 +174,7 @@ func (t *Timus) Submitter(wg *sync.WaitGroup, ch chan<- database.Submission) {
 					submission.Status = 1
 					submission.Verdict = "Compiling"
 					submission.SubmissionNumber = id
+
 					ch <- submission
 
 					// устанавливаем время

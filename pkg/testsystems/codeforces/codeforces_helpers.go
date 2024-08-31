@@ -1,27 +1,17 @@
 package codeforces
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
-	"io"
+	"fmt"
 	"log"
-	"mime/multipart"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
 	"unicode"
 
 	"github.com/PuerkitoBio/goquery"
-	"golang.org/x/text/encoding/charmap"
-	"golang.org/x/text/transform"
 )
-
-func decodeWindows1251(reader io.Reader) (io.Reader, error) {
-	decoder := charmap.Windows1251.NewDecoder()
-	return transform.NewReader(reader, decoder), nil
-}
 
 func saveToFile(filename, content string) error {
 	file, err := os.Create(filename)
@@ -56,110 +46,10 @@ func extractValuePref(part, prefix string) string {
 	return ""
 }
 
-func parseTableToJSON(table *goquery.Selection, doc *goquery.Document) string {
-	tests := []map[string]string{}
-	inputData := ""
-	outputData := ""
-	/* у codeforces какая то неадекватная структура.
-	В том числе не всегда даны входные и выходные данные,
-	*/
-	doc.Find("html body div#body div div#pageContent.content-with-sidebar div.problemindexholder div.ttypography div.problem-statement div.sample-tests div.sample-test div.input").NextUntil("html body div#body div div#pageContent.content-with-sidebar div.problemindexholder div.ttypography div.problem-statement div.sample-tests div.sample-test div.input").Each(func(i int, s *goquery.Selection) {
-		outputData = s.Text()
-		outputData = strings.TrimPrefix(outputData, "Выходные данные")
-	})
-
-	table.Find(".test-example-line").Each(func(i int, s *goquery.Selection) {
-		inputData += s.Text() + "\n"
-	})
-	test := map[string]string{
-		"input":  strings.TrimSpace(inputData),
-		"output": strings.TrimSpace(outputData),
-	}
-	tests = append(tests, test)
-	jsonTests, err := json.MarshalIndent(tests, "", "  ")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return string(jsonTests)
-}
-
-// Submit - Функция для выполнения второго запроса
-func Submit(client *http.Client, submitURL string, fileData url.Values, taskId string) (string, error) {
-	var buffer bytes.Buffer
-	writer := multipart.NewWriter(&buffer)
-
-	// Добавление остальных полей в multipart форму
-	for key, val := range fileData {
-		_ = writer.WriteField(key, val[0])
-	}
-
-	// Закрытие multipart формы
-	writer.Close()
-
-	// Создание HTTP-запроса
-	req, err := http.NewRequest("POST", submitURL, &buffer)
-	if err != nil {
-		return "0", err
-	}
-
-	// Установка заголовка Content-Type
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-
-	// Отправка запроса
-	resp, err := client.Do(req)
-
-	if err != nil {
-		return "0", err
-	}
-	defer resp.Body.Close()
-
-	/*
-		forIdUrl := fmt.Sprintf("https://codeforces.ru/index.asp?main=status&id_mem=%d&id_res=0&id_t=%s&page=0", 333835, taskId)
-		result, err := http.Get(forIdUrl)
-		if err != nil {
-			fmt.Println("Error:", err)
-			return "1", err
-		}
-		defer result.Body.Close()
-
-		utf8Reader, err := decodeWindows1251(result.Body)
-		if err != nil {
-			log.Fatal(err)
-			return "1", err
-		}
-
-		doc, err := goquery.NewDocumentFromReader(utf8Reader)
-		if err != nil {
-			log.Fatal(err)
-			return "1", err
-		}
-
-		table := doc.Find("table.main.refresh[align='center']")
-		if table.Length() > 0 {
-			// Найти первую строку таблицы, которая не является заголовком
-			rows := table.Find("tr")
-			for i := 1; i < rows.Length(); i++ { // Начинаем с 1, чтобы пропустить заголовок
-				row := rows.Eq(i)
-				columns := row.Find("td")
-				if columns.Length() > 0 {
-					id := columns.Eq(0).Text()
-					fmt.Sprintf(id)
-					return id, nil
-				}
-			}
-		} else {
-			fmt.Println("Table not found")
-		}
-	*/
-
-	return "1", nil
-}
-
 func endChecking(verdict string) bool {
 	if verdict == "Compilation error" || verdict == "Wrong answer" || verdict == "Accepted" ||
 		verdict == "Time limit exceeded" || verdict == "Memory limit exceeded" || verdict == "Runtime error (non-zero exit code)" ||
-		verdict == "Runtime error" {
+		verdict == "RUNTIME_ERROR" || verdict == "WRONG_ANSWER" || verdict == "OK" || verdict == "COMPILATION_ERROR" {
 		return true
 	}
 	return false
@@ -174,12 +64,60 @@ func removeLeadingZeros(s string) string {
 }
 
 type Task struct {
-	ID   string
-	Name string
+	ID      string
+	Name    string
+	Points  string
+	Yourpoi int
 }
 
-func GetTaskList(count int) ([]Task, error) {
-	result, err := http.Get("https://codeforces.com/problemset/?locale=ru")
+func parseTableToJSON(table *goquery.Selection, doc *goquery.Document) string {
+	tests := []map[string]string{}
+	inputData := ""
+	outputData := ""
+
+	doc.Find("html body div#body div div#pageContent.content-with-sidebar div.problemindexholder div.ttypography div.problem-statement div.sample-tests div.sample-test div.input").NextUntil("html body div#body div div#pageContent.content-with-sidebar div.problemindexholder div.ttypography div.problem-statement div.sample-tests div.sample-test div.input").Each(func(i int, s *goquery.Selection) {
+		outputData = s.Text()
+		outputData = strings.TrimPrefix(outputData, "Выходные данные")
+	})
+
+	table.Find(".test-example-line").Each(func(i int, s *goquery.Selection) {
+		inputData += s.Text() + "\n"
+	})
+	var test map[string]string
+	if strings.TrimSpace(inputData) == "" || strings.TrimSpace(outputData) == "" {
+		test = map[string]string{
+			"input":  "Для этой задачи нет тестов",
+			"output": "-",
+		}
+
+	} else {
+		test = map[string]string{
+			"input":  strings.TrimSpace(inputData),
+			"output": strings.TrimSpace(outputData),
+		}
+
+	}
+	tests = append(tests, test)
+	jsonTests, err := json.MarshalIndent(tests, "", "  ")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(jsonTests)
+}
+
+func GetTaskList(from, count int) ([]Task, error) {
+	req, err := http.NewRequest("GET", "https://codeforces.com/problemset/?locale=ru", nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0")
+	result, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer result.Body.Close()
+
 	if err != nil {
 		return nil, err
 	}
@@ -229,5 +167,5 @@ func GetTaskList(count int) ([]Task, error) {
 			return
 		}
 	})
-	return tasks, nil
+	return tasks[from-1 : from+count-1], nil
 }

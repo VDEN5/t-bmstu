@@ -4,10 +4,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/VDEN5/t-bmstu/pkg/database"
 )
 
 var tasks []Task
@@ -68,10 +71,20 @@ func constructURL(id string, count int) string {
 	return fmt.Sprintf("https://acm.timus.ru/status.aspx?space=1&count=%d&from=%s", count, id)
 }
 
-func GetTaskList(from int, count int) ([]Task, error) {
+func GetTaskList(from int, count int, user string) ([]Task, error) {
 	doc, err := goquery.NewDocument("https://acm.timus.ru/problemset.aspx?space=1&page=all&locale=ru")
 	if err != nil {
 		return nil, err
+	}
+
+	usersols, err := database.GetUserSols(user)
+	fmt.Println(err)
+	fmt.Println(usersols)
+	mem := make(map[string]bool)
+	for _, k := range usersols {
+		if k.TestSystem == "timus" {
+			mem[strconv.Itoa(k.ProblemId)] = true
+		}
 	}
 
 	if len(tasks) == 0 {
@@ -79,14 +92,33 @@ func GetTaskList(from int, count int) ([]Task, error) {
 		doc.Find("table.problemset tr.content").Each(func(i int, s *goquery.Selection) {
 			id := s.Find("td").Eq(1).Text()
 			name := s.Find("td.name a").Text()
-
+			id1 := s.Find("td").Eq(5).Text()
 			name = strings.TrimSpace(name)
-
+			yourpoi, points := 0, 0
+			if id1 != "" {
+				points, err = strconv.Atoi(id1)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
+			}
+			// usersols, _ := database.GetUserSols(user)
+			// mem := make(map[string]bool)
+			// for _, k := range usersols {
+			// 	if k.TestSystem == "timus" {
+			// 		mem[k.ID] = true
+			// 	}
+			// }
+			if mem[id] {
+				yourpoi = points
+			}
 			if id != "" && name != "" {
 				idBytes := []byte("timus" + id)
 				tasks = append(tasks, Task{
-					ID:   base64.StdEncoding.EncodeToString(idBytes),
-					Name: name,
+					ID:      base64.StdEncoding.EncodeToString(idBytes),
+					Name:    name,
+					Points:  id1,
+					Yourpoi: yourpoi,
 				})
 			}
 		})

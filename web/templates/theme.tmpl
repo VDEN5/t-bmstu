@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Группы</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+		<link href="/styles/base.css?hash=v86ddssasda6df8" rel="stylesheet" />
+		<link href="/styles/groups.css?hash=v86d6sdasadffdf8" rel="stylesheet" />
+		<style>
+			      body {
+			          font-family: Arial, sans-serif;
+			          background-color: #E8E8E8;
+			          display: flex;
+			          justify-content: center;
+			          align-items: center;
+			          height: 100vh;
+			          margin: 0;
+			      }
+
+			      .chat-container {
+			          background: #FFFFFF;
+			          border-radius: 10px;
+			          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			          width: 400px;
+			          max-height: 600px;
+			          overflow-y: auto;
+			          display: flex;
+			          flex-direction: column;
+			      }
+
+			      .message {
+			          display: flex;
+			          align-items: flex-start;
+			          padding: 10px;
+			          border-bottom: 1px solid #E8E8E8;
+			      }
+
+			      .avatar {
+			          width: 40px;
+			          height: 40px;
+			          border-radius: 50%;
+			          margin-right: 10px;
+			      }
+
+			      .message-content {
+			          background: #F1F1F1;
+			          border-radius: 10px;
+			          padding: 10px;
+			          max-width: 300px;
+			          word-wrap: break-word;
+			      }
+
+			      .message-content.sent {
+			          background: #0088CC;
+			          color: white;
+			          margin-left: auto; /* Выравнивание сообщений отправителя вправо */
+			      }
+
+			      .input-container {
+			          display: flex;
+			          padding: 10px;
+			          border-top: 1px solid #E8E8E8;
+			      }
+
+			.message-time {
+			          font-size: 10px;
+			          color: #A9A9A9;
+			          margin-top: 5px;
+			      }
+
+			      .input-field {
+			          flex: 1;
+			          border: 1px solid #E8E8E8;
+			          border-radius: 5px;
+			          padding: 10px;
+			          margin-right: 10px;
+			          outline: none;
+			      }
+
+			      .send-button {
+			          background: #0088CC;
+			          color: white;
+			          border: none;
+			          border-radius: 5px;
+			          padding: 10px 15px;
+			          cursor: pointer;
+			      }
+
+			      .send-button:hover {
+			          background: #0077B3;
+			      }
+		</style>
+	</head>
+
+	<body>
+		<div class="avatar-container">
+			<a href="/view/profile">
+				<img src="{{.Name3}}" alt="User Avatar" class="user-avatar" />
+			</a>
+		</div>
+
+		<div id="main">
+			<nav id="sidebar" class="collapsed">
+				<a class="d-flex align-items-center text-decoration-none" onclick="toggleSidebar()">
+					<i class="bi bi-list icons simple-text"></i>
+				</a>
+
+				<a class="d-flex align-items-center text-decoration-none theme-toggle-container" id="theme-toggle" onclick="toggleTheme()">
+					<span class="me-2 icons">
+						<i class="bi bi-moon-fill simple-text"></i>
+						<i class="bi bi-sun-fill simple-text d-none"></i>
+					</span>
+
+					<span class="sidebar-label simple-text">Ночь</span>
+				</a>
+
+				<div class="center-vertically">
+					<ul class="list-unstyled">
+						<li class="mb-2">
+							<a href="/view/home" class="d-flex align-items-center text-decoration-none">
+								<span class="me-2 icons"><i class="bi bi-house-door simple-text"></i></span>
+								<span class="sidebar-label simple-text">Home</span>
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/view/rating" class="d-flex align-items-center text-decoration-none">
+								<span class="me-2 icons"><i class="bi bi-bar-chart simple-text"></i></span>
+								<span class="sidebar-label simple-text">Rating</span>
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/view/hw_iu9_bmstu" class="d-flex align-items-center text-decoration-none">
+								<span class="me-2 icons"><i class="bi bi-code-square simple-text"></i></span>
+								<span class="sidebar-label simple-text">hw_iu9_bmstu</span>
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/view/forum" class="d-flex align-items-center text-decoration-none">
+								<span class="me-2 icons"><i class="bi bi-chat-left-dots simple-text"></i></span>
+								<span class="sidebar-label simple-text">Форум</span>
+							</a>
+						</li>
+						<li class="mb-2">
+							<a href="/view/settings" class="d-flex align-items-center text-decoration-none">
+								<span class="me-2 icons"><i class="bi bi-gear simple-text"></i></span>
+								<span class="sidebar-label simple-text">Настройки</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+			<div id="content" class="collapsed">
+				<div class="container mt-5">
+					<div class="row justify-content-center">
+						<div class="col-md-6"></div>
+					</div>
+					{{range .themelist}} {{if .You}}
+
+					<div class="message">
+						<div class="message-content sent">
+							<strong>Ты: </strong> {{ .Task }}
+							<div class="message-time">{{.Time}}</div>
+						</div>
+						<a href="{{.Git}}" target="_blank">
+							<img src="{{.Ava}}" alt="Avatar" class="avatar" />
+						</a>
+					</div>
+					{{else}}
+					<div class="message">
+						<a href="{{.Git}}" target="_blank">
+							<img src="{{.Ava}}" alt="Avatar" class="avatar" />
+						</a>
+						<div class="message-content">
+							<strong>{{.Sender}}: </strong>{{ .Task }}
+							<div class="message-time">{{.Time}}</div>
+						</div>
+					</div>
+					{{end}} {{end}}
+					<form id="loginForm1" method="POST">
+						<div class="input-container">
+							<input type="text" class="input-field" id="password1" placeholder="Напишите сообщение..." />
+							<button class="send-button">Отправить</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="/scripts/base.js?hash=1fs2"></script>
+	</body>
+	<script>
+		const loginForm1 = document.getElementById('loginForm1');
+
+		    loginForm1.onsubmit = async (e) => {
+		      e.preventDefault(); // Отменяем стандартное поведение формы
+		      const password1 = document.getElementById('password1').value;
+
+		      // Выполняем отправку данных формы на сервер
+		      try {
+		        const response = await fetch(window.location.href, {
+		          method: 'POST',
+		          headers: {
+		            'Content-Type': 'application/json'
+		          },
+		          body: JSON.stringify({ password1 })
+		        });
+
+		        if (response.ok) {
+		          // Если запрос выполнен успешно, перенаправляем пользователя на другую страницу
+		          window.location.href = window.location.href;
+		        } else {
+		          const responseData = await response.json(); // Ожидаем разрешения промиса
+		      Toastify({
+		        text: responseData["error"],
+		        duration: 2000,
+		        gravity: 'top',
+		        position: 'center',
+		        style: {
+		          background: '#FF4040', // Изменим цвет фона через style
+		          color: 'white', // Изменим цвет текста
+		          fontWeight: 'bold'
+		        },
+		        className: 'custom-toast',
+		        stopOnFocus: true,
+		      }).showToast();
+
+
+		    }
+		  } catch (error) {
+
+		  }
+		};
+	</script>
+</html>

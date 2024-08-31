@@ -5,16 +5,19 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"golang.org/x/text/encoding/charmap"
-	"golang.org/x/text/transform"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/VDEN5/t-bmstu/pkg/database"
+	"golang.org/x/text/encoding/charmap"
+	"golang.org/x/text/transform"
 )
 
 func decodeWindows1251(reader io.Reader) (io.Reader, error) {
@@ -182,8 +185,10 @@ func endChecking(verdict string) bool {
 }
 
 type Task struct {
-	ID   string
-	Name string
+	ID      string
+	Name    string
+	Points  string
+	Yourpoi int
 }
 
 func removeLeadingZeros(s string) string {
@@ -194,7 +199,7 @@ func removeLeadingZeros(s string) string {
 	return trimmed
 }
 
-func GetTaskList(count int) ([]Task, error) {
+func GetTaskList(count int, user string) ([]Task, error) {
 	result, err := http.Get("https://acmp.ru/index.asp?main=tasks")
 	if err != nil {
 		fmt.Println("Error:", err)
@@ -211,21 +216,45 @@ func GetTaskList(count int) ([]Task, error) {
 		log.Fatal(err)
 	}
 
+	usersols, err := database.GetUserSols(user)
+	fmt.Println(err)
+	fmt.Println(usersols)
+	mem := make(map[string]bool)
+	for _, k := range usersols {
+		if k.TestSystem == "acmp" {
+			mem[strconv.Itoa(k.ProblemId)] = true
+		}
+	}
+
 	var tasks []Task
 
 	doc.Find("table.main tr.white").Each(func(i int, s *goquery.Selection) {
 		if i < count {
 			id := s.Find("td").Eq(0).Text()
 			name := s.Find("td").Eq(1).Text()
+			poi := s.Find("td").Eq(4).Text()
 
 			id = removeLeadingZeros(strings.TrimSpace(id))
 			name = strings.TrimSpace(name)
+			poi = removeLeadingZeros(strings.TrimSpace(poi))
+			poi = poi[:len(poi)-1]
 
+			yourpoi := 0
+			points, err := strconv.Atoi(poi)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			if mem[id] {
+				yourpoi = points
+			}
 			if id != "" && name != "" {
 				idBytes := []byte("acmp" + id)
 				tasks = append(tasks, Task{
-					ID:   base64.StdEncoding.EncodeToString(idBytes),
-					Name: name,
+					ID:      base64.StdEncoding.EncodeToString(idBytes),
+					Name:    name,
+					Points:  poi,
+					Yourpoi: yourpoi,
 				})
 			}
 		}

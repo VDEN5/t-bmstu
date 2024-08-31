@@ -2,18 +2,85 @@ package testsystems
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"strconv"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/VDEN5/t-bmstu/pkg/database"
 	"github.com/VDEN5/t-bmstu/pkg/testsystems/acmp"
+	"github.com/VDEN5/t-bmstu/pkg/testsystems/codeforces"
 	"github.com/VDEN5/t-bmstu/pkg/testsystems/timus"
 	"github.com/VDEN5/t-bmstu/pkg/websockets"
 )
+
+func getpointstimus(id int) int {
+	reqURL := "https://timus.online/problem.aspx?space=1&num=" + strconv.Itoa(id)
+	resp, err := http.Get(reqURL)
+	if err != nil {
+		fmt.Println(err)
+		return -1
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return -1
+	}
+
+	str := string(body)
+	ind := strings.Index(str, "problem_links")
+	str = str[ind+33:]
+	ind = strings.Index(str, "</SPAN>")
+	str = str[:ind]
+	res, err := strconv.Atoi(str)
+	if err != nil {
+		fmt.Printf("this is not number %s", err)
+		return -1
+	}
+	return res
+}
+
+func getpointsacmp(id int) int {
+	reqURL := "https://acmp.ru/index.asp?main=task&id_task=" + strconv.Itoa(id)
+	resp, err := http.Get(reqURL)
+	if err != nil {
+		fmt.Println(err)
+		return -1
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return -1
+	}
+
+	str := string(body)
+	ind := strings.Index(str, "</h1>")
+	str = str[ind:]
+	ind = strings.Index(str, "</i>")
+	str = str[:ind]
+	ind = strings.Index(str, "%")
+	str = str[ind-8 : ind]
+	ind = strings.Index(str, ": ")
+	str = str[ind+2:]
+	res, err := strconv.Atoi(str)
+	if err != nil {
+		fmt.Printf("this is not number %s", err)
+		return -1
+	}
+	return res
+}
 
 // AllowedTestsystems - разрешенные (добавленные) тестирующие системы
 var AllowedTestsystems = []TestSystem{
 	&timus.Timus{Name: "timus"},
 	&acmp.ACMP{Name: "acmp"},
+	&codeforces.Codeforces{Name: "codeforces"},
 }
 
 // TestSystem - это интерфейс класса тестирующей системы, то есть все тестирующие системы должны обладать этими функциями
@@ -88,6 +155,36 @@ func InitGorutines() error {
 
 				// передать по веб-сокету
 				go websockets.SendMessageToUser(msg.SenderLogin, msg)
+				if msg.Verdict == "Accepted" {
+					fmt.Println("wow")
+					ex, err := database.ExistSols(msg.SenderLogin, msg.TestingSystem, msg.TaskID)
+					if err != nil {
+						fmt.Println(err)
+					}
+
+					if !ex {
+						a, err := strconv.Atoi(msg.TaskID)
+						if err != nil {
+							fmt.Println(err)
+						}
+
+						b := 0
+						if msg.TestingSystem == "acmp" {
+							b = getpointsacmp(a)
+						} else {
+							if msg.TestingSystem == "timus" {
+								b = getpointstimus(a)
+							}
+						}
+						database.CreateSolution(database.Ranktable{
+							RankUser:   msg.SenderLogin,
+							TestSystem: msg.TestingSystem,
+							ProblemId:  a,
+							Points:     b,
+							Time:       time.Now(),
+						})
+					}
+				}
 			}
 		}(ch)
 	}
